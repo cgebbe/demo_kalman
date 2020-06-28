@@ -23,3 +23,5 @@ $$
 \dot{z} & = -\beta z + xy
 \end{aligned}
 $$
+
+foo bar
