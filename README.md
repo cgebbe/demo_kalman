@@ -111,11 +111,11 @@ More generally, the prediction step can be written as...
 <p align="center"><img src="/tex/62f35d1bc17322f6b2df870cc557e46b.svg?invert_in_darkmode&sanitize=true" align=middle width=615.0397571999999pt height=79.6354845pt/></p>
 
 and the update step as ...
-<p align="center"><img src="/tex/78afbf3e91d69bb27927c7725554a2d7.svg?invert_in_darkmode&sanitize=true" align=middle width=477.68343974999993pt height=127.92031559999998pt/></p>
+<p align="center"><img src="/tex/8d1a81aca3730896de1953644bf3183b.svg?invert_in_darkmode&sanitize=true" align=middle width=460.85689979999995pt height=127.92031559999998pt/></p>
 
 In many [sources](http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pdf/slam02-bayes-filter-short.pdf)  the notation of belief is introduced, making the recursive nature of the algorithm even more obvious:
 
-<p align="center"><img src="/tex/9758ced3ec07da7e127401351e5dfb0e.svg?invert_in_darkmode&sanitize=true" align=middle width=0.0pt height=0.0pt/></p>
+<p align="center"><img src="/tex/f8defb71ba97ec0a12f181f856df818c.svg?invert_in_darkmode&sanitize=true" align=middle width=440.96368635pt height=61.91801715pt/></p>
 
 
 
