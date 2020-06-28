@@ -191,7 +191,7 @@ $$
 and the update step as ...
 $$
 \begin{align}
-p(x_k| u_{k:1}, z_{k-1:1}) 
+p(x_k| u_{k:1}, z_{k:1}) 
 =& \frac{p(z_k|x_k, u_{k:1}, z_{k-1:1}) p(x_k|u_{k:1}, z_{k-1:1})}{p(z_k|u_{k:1}, z_{k-1:1})} \\
 =& \frac{p(z_k|x_k) p(x_k|u_{k:1}, z_{k-1:1})}{p(z_k)} \\
 =& \eta \ p(z_k|x_k) p(x_k|u_{k:1}, z_{k-1:1}) \qquad \text{ with } \eta=\frac{1}{p(z_k)}
@@ -202,9 +202,8 @@ In many [sources](http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pd
 
 $$
 \begin{align}
-bel^p(x_k)= p(x_k|u_{k:1}, z_{k-1:1}) =& \int p(x_k|x_{k-1}, u_k) bel^u(x_{k-1}) dx_{k-1} \\
-bel^u(x_k) = p(x_k| u_{k:1}, z_{k-1:1}) =& \eta \ p(z_k|x_k) bel^p(x_k)
-
+\overline{bel}(x_k) =& p(x_k|u_{k:1}, z_{k-1:1}) = \int p(x_k|x_{k-1}, u_k) bel(x_{k-1}) dx_{k-1} \\
+bel(x_k) =& p(x_k| u_{k:1}, z_{k:1}) = \eta \ p(z_k|x_k) \overline{bel}(x_k)
 \end{align}
 $$
 
