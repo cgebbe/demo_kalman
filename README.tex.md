@@ -2,10 +2,10 @@
 
 Documentation (maybe later code) to better understand the Kalman filter. Questions in particular:
 
-- What is the relationship between a Kalman filter and the Bayes filter
+- What is the relationship between a Kalman filter and the Bayes filter?
 - Why is the Kalman gain calculated the way it is?
 - How does the EKF and UKF work?
-- How does a particle filter differ from the Kalman filter?
+- How does the particle filter differ from the Kalman filter?
 
 
 
@@ -212,14 +212,12 @@ $$
 
 #### Type of probability distribution
 
-Up until now, we have never further specified how exactly the probability distribution $p(x_k)$ shall look like.  The probability distribution can in theory take any form, for example
+Up until now, we have never specified how exactly the probability distribution $p(x_k)$ looks.  The probability distribution can in theory take any form. However, in practice the calculations become very complex for arbitrary systems and probability distributions. Therefore, two efficient probability distributions dominate the applications
 
-- a normal distribution (Kalman filter!)
-- a number of discrete points sampled from an arbitrary probability distribution (particle filter!)
-- a gamma distribution (?)
-- ... 
+- a (continuous) normal distribution used by the Kalman filter
+- a number of discrete particles sampled from an arbitrary probability distribution (particle filter)
 
-Depending on the type of probability distribution, some useful properties emerge, which we will analyze in the following.
+Both implementations will be presented in the following.
 
 ## Kalman filter
 
@@ -229,6 +227,7 @@ As mentioned above, the Kalman filter assumes that the probability density funct
 $$
 p(x)=\mathcal{N}(\mu,\Sigma) = \frac{1}{\sqrt(2\pi)^k|\Sigma|}exp\left( -\frac{1}{2}(x-\mu)^T \Sigma^{-1}(x-\mu)\right)
 $$
+
 , where $x,\mu\in\mathbb{R}^n$ and $\Sigma \in \mathbb{R}^{n\times n}$ . During the prediction and update step of the Bayes filter we perform three types of calculations
 
 1. We multiply two probability density functions together
@@ -244,9 +243,10 @@ p(x) =& p_1(x)p_2(x) \\
 \\
 \text{ with } & \mu_3 = \mu_1 + K(\mu_2-\mu_1) \\
 & \Sigma_3 = \Sigma_1 + K(\Sigma_2+\Sigma_1)K^T \\ 
-& K=\Sigma_1(\Sigma_1+\Sigma_2)^{-1}\end{aligned}
+& K=\Sigma_1(\Sigma_1+\Sigma_2)^{-1}
+\end{aligned}
 $$
-Concerning point 2 and point 3. In general, it cannot be guaranteed that the resulting PDF of the prediction and update step is also a normal PDF. In order to ensure this, we have to constrain the type of system model and measurement model. These models must be a linear combination of the [following form](https://en.wikipedia.org/wiki/Kalman_filter#Underlying_dynamical_system_model), otherwise the resulting PDF is not a normal PDF anymore:
+Concerning point 2 and point 3: In general, it cannot be guaranteed that the resulting PDF of the prediction and update step is also a normal PDF. In order to ensure this, we have to constrain the type of system model and measurement model. These models must be a linear combination of the [following form](https://en.wikipedia.org/wiki/Kalman_filter#Underlying_dynamical_system_model), otherwise the resulting PDF is not a normal PDF anymore:
 
 - $p(x_k) = F_k p(x_{k-1}) + B_k u_k + w_k$  for the system model
 
@@ -305,8 +305,8 @@ The Kalman filter is optimal in the sense that **if** the system and measurement
 In the normal Kalman filter we needed to constrain the type of system and measurement model to linear combinations in order to keep the resulting PDF a normal PDF. This is a problem because many systems in practice are not simple linear combinations but behave nonlinearly. Generally, we can write the models as follows
 $$
 \begin{aligned}
-p(x_k)=&f(x_{k-1},u_k)+w_k \qquad \text{for the system model} \\
-p(z_K)=&h(x_k)+v_k \qquad \text{for the measurement model}
+p(x_k)=&f(p(x_{k-1}),u_k)+w_k \qquad \text{for the system model} \\
+p(z_K)=&h(p(x_k))+v_k \qquad \text{for the measurement model}
 \end{aligned}
 $$
 
@@ -323,4 +323,24 @@ This results in the following prediction and update step ([source: wikipedia](ht
 
 #### Unscented Kalman filter (UKF)
 
-XXX
+The EKF has two drawbacks:
+
+1. For highly nonlinear systems, the approach from the extended Kalman filter becomes inaccurate, since the covariance is determined using only a linear approximation around the mean.
+2. The calculation of the Jacobian matrices $F_k$ and $H_k$ can become very difficult for complex system and measurement models
+
+Therefore, the UKF proposes to determine the covariance matrix (and also the mean ?!) through a deterministic sampling technique known as unscented transformation. Effectively, it selects some sample points around the predetermined mean, propagates them through the nonlinear functions and calculates the new mean and covariance estimates based on those propagated points. More details can be found on [wikipedia](https://en.wikipedia.org/wiki/Kalman_filter#Unscented_Kalman_filter) and [the original paper](https://www.seas.harvard.edu/courses/cs281/papers/unscented.pdf).
+
+
+
+## Particle filter
+
+The Kalman filter has the drawback that the PDF is always modeled as a normal distribution with one likely center. However, in practice the shape of the PDF may have a significantly different form. For example, the likely position of a kidnapped robot detecting a door is any position on the map in front of the door. Therefore, we would like to be able to model such PDFs more accurately.
+
+The issue is that arbitrary PDFs can become very complex. Particle filters solve this complexity by sampling discrete points from the PDF, which can then be dealt with easily. There seem to exist [various forms of particle filters](https://en.wikipedia.org/wiki/Particle_filter#Particle_filters). In the following, I will refer to the one presented in the [FastSLAM paper](http://robots.stanford.edu/papers/montemerlo.fastslam-tr.pdf).
+
+- At the beginning $k=0$, we initialize $N$ particles $x_0^0, x_0^1, ..., x_0^N$ with a random discrete random system state and constant weights $w^0, w^1, ..., w^N$. 
+- During the **prediction** step, we can compute the next likely system state $p(x_1|x_0,u_1)$ for each discrete particle separately using any system model.
+- During the **update** step, we update the weight of each particle using the measurement model via $w_k^i=p(z_k|x_k,z_{k-1:1})$
+- Finally, we **resample** the particles. This step replaces the current set of particles with another set according to the updated weights.
+
+The three steps prediction, update and resampling are performed for each new time step.
