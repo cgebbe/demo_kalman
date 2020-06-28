@@ -300,6 +300,27 @@ The variable $K$ is often referred to as *Kalman gain*. The prediction and updat
 
 The Kalman filter is optimal in the sense that **if** the system and measurement models are accurately described it will converge to the exact solution.
 
-## Extended Kalman filter 
+#### Extended Kalman filter (EKF)
+
+In the normal Kalman filter we needed to constrain the type of system and measurement model to linear combinations in order to keep the resulting PDF a normal PDF. This is a problem because many systems in practice are not simple linear combinations but behave nonlinearly. Generally, we can write the models as follows
+$$
+\begin{aligned}
+p(x_k)=&f(x_{k-1},u_k)+w_k \qquad \text{for the system model} \\
+p(z_K)=&h(x_k)+v_k \qquad \text{for the measurement model}
+\end{aligned}
+$$
+
+In order to cope with such nonlinear systems, the extended Kalman filter performs a small trick:
+
+- The mean of the resulting normal PDF can be calculated using the non-linear functions
+- In order to calculate its variance, the non-linear functions are simply linearly approximated around the mean using a Taylor approximation
+
+This results in the following prediction and update step ([source: wikipedia](https://en.wikipedia.org/wiki/Extended_Kalman_filter)):
+
+![1593376614336](README.tex.assets/1593376614336.png)
 
 
+
+#### Unscented Kalman filter (UKF)
+
+XXX
