@@ -2,10 +2,10 @@
 
 Documentation (maybe later code) to better understand the Kalman filter. Questions in particular:
 
-- What is the relationship between a Kalman filter and the Bayes filter
+- What is the relationship between a Kalman filter and the Bayes filter?
 - Why is the Kalman gain calculated the way it is?
 - How does the EKF and UKF work?
-- How does a particle filter differ from the Kalman filter?
+- How does the particle filter differ from the Kalman filter?
 
 
 
@@ -122,14 +122,12 @@ In many [sources](http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pd
 
 #### Type of probability distribution
 
-Up until now, we have never further specified how exactly the probability distribution <img src="/tex/ec17af2e0155abf8fc68813133526228.svg?invert_in_darkmode&sanitize=true" align=middle width=38.53893284999999pt height=24.65753399999998pt/> shall look like.  The probability distribution can in theory take any form, for example
+Up until now, we have never specified how exactly the probability distribution <img src="/tex/ec17af2e0155abf8fc68813133526228.svg?invert_in_darkmode&sanitize=true" align=middle width=38.53893284999999pt height=24.65753399999998pt/> looks.  The probability distribution can in theory take any form. However, in practice the calculations become very complex for arbitrary systems and probability distributions. Therefore, two efficient probability distributions dominate the applications
 
-- a normal distribution (Kalman filter!)
-- a number of discrete points sampled from an arbitrary probability distribution (particle filter!)
-- a gamma distribution (?)
-- ... 
+- a (continuous) normal distribution used by the Kalman filter
+- a number of discrete particles sampled from an arbitrary probability distribution (particle filter)
 
-Depending on the type of probability distribution, some useful properties emerge, which we will analyze in the following.
+Both implementations will be presented in the following.
 
 ## Kalman filter
 
@@ -137,6 +135,7 @@ Depending on the type of probability distribution, some useful properties emerge
 
 As mentioned above, the Kalman filter assumes that the probability density function ("PDF") is a (multivariate) normal distribution of the following form
 <p align="center"><img src="/tex/3ab8a916bb252fe76affbe828e65a15c.svg?invert_in_darkmode&sanitize=true" align=middle width=433.94487675pt height=42.4111644pt/></p>
+
 , where <img src="/tex/b8e7943cc8e0043fe55d353165cbe678.svg?invert_in_darkmode&sanitize=true" align=middle width=66.69513509999999pt height=22.648391699999998pt/> and <img src="/tex/c621a26ecacdba7a3f747a8d43dccb99.svg?invert_in_darkmode&sanitize=true" align=middle width=70.36156379999998pt height=26.17730939999998pt/> . During the prediction and update step of the Bayes filter we perform three types of calculations
 
 1. We multiply two probability density functions together
@@ -144,8 +143,8 @@ As mentioned above, the Kalman filter assumes that the probability density funct
 3. We calculate <img src="/tex/bc4f592922fbe07b70337e7da4f5ed11.svg?invert_in_darkmode&sanitize=true" align=middle width=58.83775424999998pt height=24.65753399999998pt/> in the update step using the measurement model
 
 Concerning the first point: Multiplying two normal distributions always yields another normal distribution ([source1](https://math.stackexchange.com/questions/157172/product-of-two-multivariate-gaussians-distributions), [source2 on p.331](https://mitpress.mit.edu/books/introduction-autonomous-mobile-robots)):
-<p align="center"><img src="/tex/616b253551e77de4372ad37b2f23bad8.svg?invert_in_darkmode&sanitize=true" align=middle width=239.48218799999998pt height=168.90799694999998pt/></p>
-Concerning point 2 and point 3. In general, it cannot be guaranteed that the resulting PDF of the prediction and update step is also a normal PDF. In order to ensure this, we have to constrain the type of system model and measurement model. These models must be a linear combination of the [following form](https://en.wikipedia.org/wiki/Kalman_filter#Underlying_dynamical_system_model), otherwise the resulting PDF is not a normal PDF anymore:
+<p align="center"><img src="/tex/4fd2ad091780337c0949b00a1f05880f.svg?invert_in_darkmode&sanitize=true" align=middle width=239.48218799999998pt height=168.90799694999998pt/></p>
+Concerning point 2 and point 3: In general, it cannot be guaranteed that the resulting PDF of the prediction and update step is also a normal PDF. In order to ensure this, we have to constrain the type of system model and measurement model. These models must be a linear combination of the [following form](https://en.wikipedia.org/wiki/Kalman_filter#Underlying_dynamical_system_model), otherwise the resulting PDF is not a normal PDF anymore:
 
 - <img src="/tex/ac3b01dd6cb4536d11129ca12b4f40fc.svg?invert_in_darkmode&sanitize=true" align=middle width=231.7525089pt height=24.65753399999998pt/>  for the system model
 
@@ -178,7 +177,7 @@ The Kalman filter is optimal in the sense that **if** the system and measurement
 #### Extended Kalman filter (EKF)
 
 In the normal Kalman filter we needed to constrain the type of system and measurement model to linear combinations in order to keep the resulting PDF a normal PDF. This is a problem because many systems in practice are not simple linear combinations but behave nonlinearly. Generally, we can write the models as follows
-<p align="center"><img src="/tex/d955ee83ba4a038cb9f4bfd77c281cc6.svg?invert_in_darkmode&sanitize=true" align=middle width=364.63686435pt height=41.09589pt/></p>
+<p align="center"><img src="/tex/3371aa9179d7fe1899dc9b660181eda4.svg?invert_in_darkmode&sanitize=true" align=middle width=385.69286415pt height=41.09589pt/></p>
 
 In order to cope with such nonlinear systems, the extended Kalman filter performs a small trick:
 
@@ -193,4 +192,24 @@ This results in the following prediction and update step ([source: wikipedia](ht
 
 #### Unscented Kalman filter (UKF)
 
-XXX
+The EKF has two drawbacks:
+
+1. For highly nonlinear systems, the approach from the extended Kalman filter becomes inaccurate, since the covariance is determined using only a linear approximation around the mean.
+2. The calculation of the Jacobian matrices <img src="/tex/a178eaacca2a06509317f53ac22ba70a.svg?invert_in_darkmode&sanitize=true" align=middle width=17.83682669999999pt height=22.465723500000017pt/> and <img src="/tex/9add03df84d0e62ba05ad09aaf73afeb.svg?invert_in_darkmode&sanitize=true" align=middle width=20.93043149999999pt height=22.465723500000017pt/> can become very difficult for complex system and measurement models
+
+Therefore, the UKF proposes to determine the covariance matrix (and also the mean ?!) through a deterministic sampling technique known as unscented transformation. Effectively, it selects some sample points around the predetermined mean, propagates them through the nonlinear functions and calculates the new mean and covariance estimates based on those propagated points. More details can be found on [wikipedia](https://en.wikipedia.org/wiki/Kalman_filter#Unscented_Kalman_filter) and [the original paper](https://www.seas.harvard.edu/courses/cs281/papers/unscented.pdf).
+
+
+
+## Particle filter
+
+The Kalman filter has the drawback that the PDF is always modeled as a normal distribution with one likely center. However, in practice the shape of the PDF may have a significantly different form. For example, the likely position of a kidnapped robot detecting a door is any position on the map in front of the door. Therefore, we would like to be able to model such PDFs more accurately.
+
+The issue is that arbitrary PDFs can become very complex. Particle filters solve this complexity by sampling discrete points from the PDF, which can then be dealt with easily. There seem to exist [various forms of particle filters](https://en.wikipedia.org/wiki/Particle_filter#Particle_filters). In the following, I will refer to the one presented in the [FastSLAM paper](http://robots.stanford.edu/papers/montemerlo.fastslam-tr.pdf).
+
+- At the beginning <img src="/tex/8df03261b67972f1573d96bd4fcb462e.svg?invert_in_darkmode&sanitize=true" align=middle width=39.21220214999999pt height=22.831056599999986pt/>, we initialize <img src="/tex/f9c4988898e7f532b9f826a75014ed3c.svg?invert_in_darkmode&sanitize=true" align=middle width=14.99998994999999pt height=22.465723500000017pt/> particles <img src="/tex/10abd0b67d529179ffccd74dbe8c88e4.svg?invert_in_darkmode&sanitize=true" align=middle width=90.19636724999998pt height=27.6567522pt/> with a random discrete random system state and constant weights <img src="/tex/aa9bf6f0c205d60738bb5ac653613393.svg?invert_in_darkmode&sanitize=true" align=middle width=98.64393989999999pt height=27.6567522pt/>. 
+- During the **prediction** step, we can compute the next likely system state <img src="/tex/954f422784112baef9cc54f24f2ede3d.svg?invert_in_darkmode&sanitize=true" align=middle width=83.25173505pt height=24.65753399999998pt/> for each discrete particle separately using any system model.
+- During the **update** step, we update the weight of each particle using the measurement model via <img src="/tex/b8803b9819cfbcb00bb63606e91928bf.svg?invert_in_darkmode&sanitize=true" align=middle width=150.7508805pt height=27.15900329999998pt/>
+- Finally, we **resample** the particles. This step replaces the current set of particles with another set according to the updated weights.
+
+The three steps prediction, update and resampling are performed for each new time step.
