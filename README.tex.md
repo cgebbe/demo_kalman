@@ -286,7 +286,7 @@ p(x_1|u_1,z_1)
 =& \dots = \mathcal{N}(\mu_1, \Sigma_1) \\
 \\
 \text{ with } &  \mu_1=\overline{\mu}_1 + K_1(z_1-H_1\overline{\mu}_1) \\
- & \Sigma_1=(\mathbb{1}-K_1 H_1) \overline{\Sigma}_1  \\
+ & \Sigma_1=(\mathbb{I}-K_1 H_1) \overline{\Sigma}_1  \\
  & K_1 = \overline{\Sigma}_1 H_1^T (H_1  \overline{\Sigma}_1 H_1^T + R_1)^{-1}
 \end{align}
 $$
