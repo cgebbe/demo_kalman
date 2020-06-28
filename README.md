@@ -115,7 +115,7 @@ and the update step as ...
 
 In many [sources](http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pdf/slam02-bayes-filter-short.pdf)  the notation of belief is introduced, making the recursive nature of the algorithm even more obvious:
 
-<p align="center"><img src="/tex/9e8d499cb7fd9f68cb83b68ddee1c205.svg?invert_in_darkmode&sanitize=true" align=middle width=0.0pt height=0.0pt/></p>
+<p align="center"><img src="/tex/9758ced3ec07da7e127401351e5dfb0e.svg?invert_in_darkmode&sanitize=true" align=middle width=0.0pt height=0.0pt/></p>
 
 
 
